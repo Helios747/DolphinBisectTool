@@ -1,9 +1,11 @@
 ﻿using SevenZip;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace DolphinBisectTool
@@ -22,7 +24,7 @@ namespace DolphinBisectTool
         public Backend()
         {
             // TODO - Replace this lib with SharpCompress
-            SevenZip.SevenZipCompressor.SetLibraryPath(@"7z.dll");
+            SevenZipBase.SetLibraryPath(@"7z.dll");
         }
 
         public void Run()
@@ -73,7 +75,6 @@ namespace DolphinBisectTool
             if (show_build_page == DialogResult.Yes)
                 Process.Start("https://dolp.in/" + s_major_version + "-" + broken_build);
             m_title = "";
-            return;
         }
 
         public void SetSettings(int first, int second, MainWindow f)
@@ -96,7 +97,7 @@ namespace DolphinBisectTool
             List<int> result = new List<int>();
             WebClient client = new WebClient();
 
-            client.DownloadFileAsync(new System.Uri("https://dl.dolphin-emu.org/builds/"),
+            client.DownloadFileAsync(new Uri("https://dl.dolphin-emu.org/builds/"),
                                      "buildindex");
 
             client.DownloadProgressChanged += (s, e) =>
@@ -106,18 +107,15 @@ namespace DolphinBisectTool
 
             client.DownloadFileCompleted += (s, e) =>
             {
-                int stripped_build_num;
-                string pattern = @"(?<=dolphin-master-" + s_major_version +
-                                 @"-)(\d{1,4})(?=-x64.7z)";
-                System.Text.RegularExpressions.Regex r = new System.Text.RegularExpressions.Regex
-                (pattern);
+                Regex regex = new Regex(@"(?<=dolphin-master-" + s_major_version + @"-)(\d{1,4})(?=-x64.7z)");
 
                 using (var reader = new StreamReader("buildindex"))
                 {
                     string currentLine;
                     while ((currentLine = reader.ReadLine()) != null)
                     {
-                        int.TryParse(r.Match(currentLine).Value, out stripped_build_num);
+                        int stripped_build_num;
+                        int.TryParse(regex.Match(currentLine).Value, out stripped_build_num);
                         if (stripped_build_num != 0)
                             result.Add(stripped_build_num);
                     }
@@ -139,12 +137,12 @@ namespace DolphinBisectTool
                 if (Directory.Exists(@"dolphin"))
                     Directory.Delete(@"dolphin", true);
             }
-            catch (IOException e)
+            catch (IOException)
             {
             }
 
             WebClient client = new WebClient();
-            client.DownloadFileAsync(new System.Uri(url), "dolphin.7z");
+            client.DownloadFileAsync(new Uri(url), "dolphin.7z");
 
             client.DownloadProgressChanged += (s, e) =>
             {
