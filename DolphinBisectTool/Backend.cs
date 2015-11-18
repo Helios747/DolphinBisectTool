@@ -1,9 +1,11 @@
 ﻿using SevenZip;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace DolphinBisectTool
@@ -22,7 +24,7 @@ namespace DolphinBisectTool
         public Backend()
         {
             // TODO - Replace this lib with SharpCompress
-            SevenZip.SevenZipCompressor.SetLibraryPath(@"7z.dll");
+            SevenZipBase.SetLibraryPath(@"7z.dll");
         }
 
         public void Run()
@@ -73,7 +75,6 @@ namespace DolphinBisectTool
             if (show_build_page == DialogResult.Yes)
                 Process.Start("https://dolp.in/" + s_major_version + "-" + broken_build);
             m_title = "";
-            return;
         }
 
         public void SetSettings(int first, int second, MainWindow f)
@@ -94,39 +95,37 @@ namespace DolphinBisectTool
         public void DownloadBuildList(MainWindow form)
         {
             List<int> result = new List<int>();
-            WebClient client = new WebClient();
-
-            client.DownloadFileAsync(new System.Uri("https://dl.dolphin-emu.org/builds/"),
-                                     "buildindex");
-
-            client.DownloadProgressChanged += (s, e) =>
+            using (var client = new WebClient())
             {
-                form.ChangeProgressBar(e.ProgressPercentage, "Downloading build index");
-            };
+                client.DownloadFileAsync(new Uri("https://dl.dolphin-emu.org/builds/"),
+                    "buildindex");
 
-            client.DownloadFileCompleted += (s, e) =>
-            {
-                int stripped_build_num;
-                string pattern = @"(?<=dolphin-master-" + s_major_version +
-                                 @"-)(\d{1,4})(?=-x64.7z)";
-                System.Text.RegularExpressions.Regex r = new System.Text.RegularExpressions.Regex
-                (pattern);
-
-                using (var reader = new StreamReader("buildindex"))
+                client.DownloadProgressChanged += (s, e) =>
                 {
-                    string currentLine;
-                    while ((currentLine = reader.ReadLine()) != null)
-                    {
-                        int.TryParse(r.Match(currentLine).Value, out stripped_build_num);
-                        if (stripped_build_num != 0)
-                            result.Add(stripped_build_num);
-                    }
+                    form.ChangeProgressBar(e.ProgressPercentage, "Downloading build index");
+                };
 
-                    result.Sort();
-                    m_build_list = result;
-                    form.PopulateComboBoxes(result);
-                }
-            };
+                client.DownloadFileCompleted += (s, e) =>
+                {
+                    Regex regex = new Regex(@"(?<=dolphin-master-" + s_major_version + @"-)(\d{1,4})(?=-x64.7z)");
+
+                    using (var reader = new StreamReader("buildindex"))
+                    {
+                        string currentLine;
+                        while ((currentLine = reader.ReadLine()) != null)
+                        {
+                            int stripped_build_num;
+                            int.TryParse(regex.Match(currentLine).Value, out stripped_build_num);
+                            if (stripped_build_num != 0)
+                                result.Add(stripped_build_num);
+                        }
+
+                        result.Sort();
+                        m_build_list = result;
+                        form.PopulateComboBoxes(result);
+                    }
+                };
+            }
         }
 
         private void DownloadBuild(string url, int index)
@@ -139,28 +138,30 @@ namespace DolphinBisectTool
                 if (Directory.Exists(@"dolphin"))
                     Directory.Delete(@"dolphin", true);
             }
-            catch (IOException e)
+            catch (IOException)
             {
             }
 
-            WebClient client = new WebClient();
-            client.DownloadFileAsync(new System.Uri(url), "dolphin.7z");
-
-            client.DownloadProgressChanged += (s, e) =>
+            using (var client = new WebClient())
             {
-                m_form.ChangeProgressBar(e.ProgressPercentage, "Downloading build " +
-                                         m_build_list.ElementAt(index));
-            };
+                client.DownloadFileAsync(new Uri(url), "dolphin.7z");
 
-            client.DownloadFileCompleted += (s, e) =>
-            {
-                // Known Bug: Sometimes the label doesn't get updated before it extracts and
-                // launches. I want to blame this meh-level 7z lib blocking something.
-                m_form.ChangeProgressBar(0, "Extracting and launching");
-                SevenZipExtractor DolphinZip = new SevenZipExtractor(@"dolphin.7z");
-                DolphinZip.ExtractArchive("dolphin");
-                m_download_complete = true;
-            };
+                client.DownloadProgressChanged += (s, e) =>
+                {
+                    m_form.ChangeProgressBar(e.ProgressPercentage, "Downloading build " +
+                                                                   m_build_list.ElementAt(index));
+                };
+
+                client.DownloadFileCompleted += (s, e) =>
+                {
+                    // Known Bug: Sometimes the label doesn't get updated before it extracts and
+                    // launches. I want to blame this meh-level 7z lib blocking something.
+                    m_form.ChangeProgressBar(0, "Extracting and launching");
+                    SevenZipExtractor DolphinZip = new SevenZipExtractor(@"dolphin.7z");
+                    DolphinZip.ExtractArchive("dolphin");
+                    m_download_complete = true;
+                };
+            }
 
             while (!m_download_complete)
             {
@@ -171,14 +172,16 @@ namespace DolphinBisectTool
 
         private void RunBuild()
         {
-            Process runner = new Process();
-            runner.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory() +
-                                                @"\dolphin\Dolphin-x64\";
-            runner.StartInfo.FileName = "Dolphin.exe";
-            if (!m_title.Equals(""))
-                runner.StartInfo.Arguments = "/b /e " + "\"" + m_title + "\"";
-            runner.Start();
-            runner.WaitForExit();
+            using (var runner = new Process())
+            {
+                runner.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory() +
+                                                    @"\dolphin\Dolphin-x64\";
+                runner.StartInfo.FileName = "Dolphin.exe";
+                if (!m_title.Equals(""))
+                    runner.StartInfo.Arguments = "/b /e " + "\"" + m_title + "\"";
+                runner.Start();
+                runner.WaitForExit();
+            }
         }
     }
 }
