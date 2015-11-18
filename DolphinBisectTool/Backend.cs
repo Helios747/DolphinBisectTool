@@ -1,14 +1,9 @@
 ﻿using SevenZip;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DolphinBisectTool
@@ -50,7 +45,7 @@ namespace DolphinBisectTool
                 RunBuild();
 
                 DialogResult dialog_result = MessageBox.Show("Testing build " +
-                             m_build_list.ElementAt(index) + ". " +"Does the issue appear?",
+                             m_build_list.ElementAt(index) + ". Does the issue appear?",
                              "Notice", MessageBoxButtons.YesNoCancel);
 
                 if (dialog_result == DialogResult.Yes)
@@ -68,8 +63,15 @@ namespace DolphinBisectTool
                 }
             }
 
-            MessageBox.Show("Build " + s_major_version + "-" +
-                            m_build_list.ElementAt(index) + " may be the cause of your issue.");
+            int broken_build = (m_build_list.ElementAt(index) + 1);
+            DialogResult show_build_page =
+                         MessageBox.Show("Build " + s_major_version + "-" + broken_build +
+                                         " may be the cause of your issue. " +
+                                         "Do you want to open the URL for that build?", "Notice",
+                                         MessageBoxButtons.YesNo);
+
+            if (show_build_page == DialogResult.Yes)
+                Process.Start("https://dolp.in/" + s_major_version + "-" + broken_build);
             m_title = "";
             return;
         }
