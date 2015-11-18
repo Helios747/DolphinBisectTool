@@ -18,7 +18,7 @@ namespace DolphinBisectTool
         // Follow this format: (Major).0
         public static string s_major_version = "4.0";
         bool m_download_complete = false;
-        List<int> m_build_list = new List<int>();
+        public List<int> m_build_list = new List<int>();
         MainWindow m_form;
 
         public Backend()
@@ -92,39 +92,31 @@ namespace DolphinBisectTool
             m_form = f;
         }
 
-        public void DownloadBuildList(MainWindow form)
+        public void DownloadBuildList()
+        {
+            using (WebClient client = new WebClient())
+                client.DownloadFile(new Uri("https://dl.dolphin-emu.org/builds/"),
+                         "buildindex");
+        }
+
+        public void ProcessBuildList()
         {
             List<int> result = new List<int>();
-            using (var client = new WebClient())
+            Regex regex = new Regex(@"(?<=dolphin-master-" + s_major_version + @"-)(\d{1,4})(?=-x64.7z)");
+
+            using (StreamReader reader = new StreamReader("buildindex"))
             {
-                client.DownloadFileAsync(new Uri("https://dl.dolphin-emu.org/builds/"),
-                    "buildindex");
-
-                client.DownloadProgressChanged += (s, e) =>
+                string current_line;
+                while ((current_line = reader.ReadLine()) != null)
                 {
-                    form.ChangeProgressBar(e.ProgressPercentage, "Downloading build index");
-                };
+                    int stripped_build_num;
+                    int.TryParse(regex.Match(current_line).Value, out stripped_build_num);
+                    if (stripped_build_num != 0)
+                        result.Add(stripped_build_num);
+                }
 
-                client.DownloadFileCompleted += (s, e) =>
-                {
-                    Regex regex = new Regex(@"(?<=dolphin-master-" + s_major_version + @"-)(\d{1,4})(?=-x64.7z)");
-
-                    using (var reader = new StreamReader("buildindex"))
-                    {
-                        string currentLine;
-                        while ((currentLine = reader.ReadLine()) != null)
-                        {
-                            int stripped_build_num;
-                            int.TryParse(regex.Match(currentLine).Value, out stripped_build_num);
-                            if (stripped_build_num != 0)
-                                result.Add(stripped_build_num);
-                        }
-
-                        result.Sort();
-                        m_build_list = result;
-                        form.PopulateComboBoxes(result);
-                    }
-                };
+                result.Sort();
+                m_build_list = result;
             }
         }
 
@@ -142,14 +134,14 @@ namespace DolphinBisectTool
             {
             }
 
-            using (var client = new WebClient())
+            using (WebClient client = new WebClient())
             {
                 client.DownloadFileAsync(new Uri(url), "dolphin.7z");
 
                 client.DownloadProgressChanged += (s, e) =>
                 {
                     m_form.ChangeProgressBar(e.ProgressPercentage, "Downloading build " +
-                                                                   m_build_list.ElementAt(index));
+                                             m_build_list.ElementAt(index));
                 };
 
                 client.DownloadFileCompleted += (s, e) =>
@@ -157,8 +149,8 @@ namespace DolphinBisectTool
                     // Known Bug: Sometimes the label doesn't get updated before it extracts and
                     // launches. I want to blame this meh-level 7z lib blocking something.
                     m_form.ChangeProgressBar(0, "Extracting and launching");
-                    SevenZipExtractor DolphinZip = new SevenZipExtractor(@"dolphin.7z");
-                    DolphinZip.ExtractArchive("dolphin");
+                    SevenZipExtractor dolphin_zip = new SevenZipExtractor(@"dolphin.7z");
+                    dolphin_zip.ExtractArchive("dolphin");
                     m_download_complete = true;
                 };
             }
