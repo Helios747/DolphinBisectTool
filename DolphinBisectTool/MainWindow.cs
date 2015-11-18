@@ -39,6 +39,13 @@ namespace DolphinBisectTool
                 return;
             }
 
+            if (first_dev_build.SelectedIndex >= second_dev_build.SelectedIndex)
+            {
+                MessageBox.Show("First build cannot be newer than second",
+                                "Error", MessageBoxButtons.OK);
+                return;
+            }
+
             if (boot_title.Checked && file_path_textbox.Text.Equals(""))
             {
                 MessageBox.Show("Boot title enabled with no game / title selected",
