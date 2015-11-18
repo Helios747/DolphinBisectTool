@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace DolphinBisectTool
@@ -11,8 +12,26 @@ namespace DolphinBisectTool
         public MainWindow()
         {
             InitializeComponent();
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            m_backend.DownloadBuildList(this);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+
+            download_label.Text = "Downloading build index";
+            download_label.Visible = true;
+
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.DoWork += PostLoadTasks;
+            bw.RunWorkerCompleted += PostLoadTasksCompleted;
+            bw.RunWorkerAsync();
+        }
+
+        private void PostLoadTasks(object sender, DoWorkEventArgs e)
+        {
+            m_backend.new_DownloadBuildList();
+            m_backend.new_ProcessBuildList();
+        }
+
+        private void PostLoadTasksCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            PopulateComboBoxes(m_backend.m_build_list);
         }
 
         private void btnBrowse_Click(object sender, EventArgs e)
@@ -86,10 +105,6 @@ namespace DolphinBisectTool
         {
             if (v != 100)
             {
-                // Known bug - Downloading build index doesn't update progress bar
-                // properly. Reason for this I believe is because the WebClient doesn't
-                // know how large the file is.
-
                 download_bar.Visible = true;
                 download_label.Text = t;
                 download_label.Visible = true;
@@ -102,7 +117,7 @@ namespace DolphinBisectTool
             }
         }
 
-        public void PopulateComboBoxes(List<int> l)
+        private void PopulateComboBoxes(List<int> l)
         {
             foreach (int i in l)
             {
@@ -127,6 +142,7 @@ namespace DolphinBisectTool
             start_button.Enabled = true;
             radio_development.Enabled = true;
             radio_stable.Enabled = true;
+            download_label.Visible = false;
         }
 
         private void rbFirstStable_CheckedChanged(object sender, EventArgs e)
