@@ -14,4 +14,5 @@ Dolphin Bisect Tool was written by Anthony 'Helios' Serna.
 
 Discussion about the utility should be directed here:
 
+[https://forums.dolphin-emu.org/Thread-green-notice-development-thread-unofficial-dolphin-bisection-tool-for-finding-broken-builds] (https://forums.dolphin-emu.org/Thread-green-notice-development-thread-unofficial-dolphin-bisection-tool-for-finding-broken-builds)
 Alternatively, you can contact me on #dolphin-emu, freenode under Helios747
