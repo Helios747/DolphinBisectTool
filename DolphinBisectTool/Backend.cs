@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace DolphinBisectTool
 {
@@ -17,7 +18,6 @@ namespace DolphinBisectTool
         string m_title = "";
         // Follow this format: (Major).0
         public static string s_major_version = "4.0";
-        bool m_download_complete = false;
         public List<int> m_build_list = new List<int>();
         MainWindow m_form;
 
@@ -135,9 +135,8 @@ namespace DolphinBisectTool
             }
 
             using (WebClient client = new WebClient())
+            using (var download_finished = new ManualResetEvent(false))
             {
-                client.DownloadFileAsync(new Uri(url), "dolphin.7z");
-
                 client.DownloadProgressChanged += (s, e) =>
                 {
                     m_form.ChangeProgressBar(e.ProgressPercentage, "Downloading build " +
@@ -151,15 +150,12 @@ namespace DolphinBisectTool
                     m_form.ChangeProgressBar(0, "Extracting and launching");
                     SevenZipExtractor dolphin_zip = new SevenZipExtractor(@"dolphin.7z");
                     dolphin_zip.ExtractArchive("dolphin");
-                    m_download_complete = true;
+                    download_finished.Set();
                 };
-            }
 
-            while (!m_download_complete)
-            {
-                Application.DoEvents();
+                client.DownloadFileAsync(new Uri(url), "dolphin.7z");
+                download_finished.WaitOne();
             }
-            m_download_complete = false;
         }
 
         private void RunBuild()
