@@ -98,7 +98,7 @@ namespace DolphinBisectTool
             {
                 client.DownloadProgressChanged += (s, e) =>
                 {
-                    m_form.ChangeProgressBar(e.ProgressPercentage, "Downloading build index");
+                    m_form.ChangeProgressBar(e.TotalBytesToReceive > 0 ? e.ProgressPercentage : -1, "Downloading build index");
                 };
 
                 client.DownloadFileCompleted += (s, e) =>
@@ -160,7 +160,7 @@ namespace DolphinBisectTool
                 {
                     // Known Bug: Sometimes the label doesn't get updated before it extracts and
                     // launches. I want to blame this meh-level 7z lib blocking something.
-                    m_form.ChangeProgressBar(0, "Extracting and launching");
+                    m_form.ChangeProgressBar(-1, "Extracting and launching");
                     SevenZipExtractor dolphin_zip = new SevenZipExtractor(@"dolphin.7z");
                     dolphin_zip.ExtractArchive("dolphin");
                     download_finished.Set();

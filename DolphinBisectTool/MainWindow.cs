@@ -117,7 +117,17 @@ namespace DolphinBisectTool
                 download_bar.Visible = true;
                 download_label.Text = t;
                 download_label.Visible = true;
-                download_bar.Value = v;
+
+                // accept -1 as indicator that we don't know the progress
+                if (v == -1)
+                {
+                    download_bar.Style = ProgressBarStyle.Marquee;
+                }
+                else
+                {
+                    download_bar.Style = ProgressBarStyle.Continuous;
+                    download_bar.Value = v;
+                }
             }
             else
             {
