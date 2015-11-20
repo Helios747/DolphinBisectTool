@@ -159,8 +159,8 @@ namespace DolphinBisectTool
                 {
                     // Known Bug: Sometimes the label doesn't get updated before it extracts and
                     // launches. I want to blame this meh-level 7z lib blocking something.
-                    m_form.ChangeProgressBar(-1, "Extracting and launching");
                     SevenZipExtractor dolphin_zip = new SevenZipExtractor(@"dolphin.7z");
+                    dolphin_zip.Extracting += (sender, eventArgs) => m_form.ChangeProgressBar(eventArgs.PercentDone, "Extracting and launching");
                     dolphin_zip.ExtractArchive("dolphin");
                     download_finished.Set();
                 };
