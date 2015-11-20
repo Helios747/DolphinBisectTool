@@ -80,29 +80,36 @@ namespace DolphinBisectTool
             {
                 m_backend.SetSettings(-1, second_dev_build.SelectedIndex, file_path_textbox.Text,
                                       this);
-                m_backend.Run();
             }
             else if (radio_stable.Checked)
             {
                 m_backend.SetSettings(-1, second_dev_build.SelectedIndex, this);
-                m_backend.Run();
             }
             else if (!radio_stable.Checked && boot_title.Checked)
             {
                 m_backend.SetSettings(first_dev_build.SelectedIndex,
                                     second_dev_build.SelectedIndex, file_path_textbox.Text, this);
-                m_backend.Run();
             }
             else
             {
                 m_backend.SetSettings(first_dev_build.SelectedIndex,
                                     second_dev_build.SelectedIndex, this);
-                m_backend.Run();
             }
+
+            var testWorker = new BackgroundWorker();
+            testWorker.DoWork += (s, ea) => m_backend.Run();
+            testWorker.RunWorkerAsync();
         }
         
         public void ChangeProgressBar(int v, string t)
         {
+            // pass the call to the UI thread if necessary
+            if (InvokeRequired)
+            {
+                Invoke(new Action<int, string>(ChangeProgressBar), v, t);
+                return;
+            }
+
             if (v != 100)
             {
                 download_bar.Visible = true;
