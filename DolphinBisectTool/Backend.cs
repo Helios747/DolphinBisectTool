@@ -1,13 +1,12 @@
-﻿using SevenZip;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using System.Threading;
+using System.Windows.Forms;
+using SevenZip;
 
 namespace DolphinBisectTool
 {
@@ -43,12 +42,12 @@ namespace DolphinBisectTool
                 else
                     index = (m_min + m_max) / 2;
 
-                DownloadBuild(base_url + "-" + m_build_list.ElementAt(index) +
+                DownloadBuild(base_url + "-" + m_build_list[index] +
                               "-x64.7z", index);
                 RunBuild();
 
                 DialogResult dialog_result = MessageBox.Show("Testing build " +
-                             m_build_list.ElementAt(index) + ". Does the issue appear?",
+                             s_major_version + "-" + m_build_list[index] + ". Did the issue appear?",
                              "Notice", MessageBoxButtons.YesNoCancel);
 
                 if (dialog_result == DialogResult.Yes)
@@ -66,7 +65,7 @@ namespace DolphinBisectTool
                 }
             }
 
-            int broken_build = (m_build_list.ElementAt(index) + 1);
+            int broken_build = (m_build_list[index] + 1);
             DialogResult show_build_page =
                          MessageBox.Show("Build " + s_major_version + "-" + broken_build +
                                          " may be the cause of your issue. " +
@@ -178,8 +177,8 @@ namespace DolphinBisectTool
                 runner.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory() +
                                                     @"\dolphin\Dolphin-x64\";
                 runner.StartInfo.FileName = "Dolphin.exe";
-                if (!m_title.Equals(""))
-                    runner.StartInfo.Arguments = "/b /e " + "\"" + m_title + "\"";
+                if (!string.IsNullOrEmpty(m_title))
+                    runner.StartInfo.Arguments = string.Format("/b /e \"{0}\"", m_title);
                 runner.Start();
                 runner.WaitForExit();
             }

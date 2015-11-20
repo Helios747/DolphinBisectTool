@@ -12,7 +12,7 @@ namespace DolphinBisectTool
         public MainWindow()
         {
             InitializeComponent();
-            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
 
             m_backend = new Backend(this);
             download_label.Text = "Downloading build index";
@@ -66,7 +66,7 @@ namespace DolphinBisectTool
                 return;
             }
 
-            if (boot_title.Checked && file_path_textbox.Text.Equals(""))
+            if (boot_title.Checked && string.IsNullOrEmpty(file_path_textbox.Text))
             {
                 MessageBox.Show("Boot title enabled with no game / title selected",
                                 "Error", MessageBoxButtons.OK);
