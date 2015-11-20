@@ -7,13 +7,14 @@ namespace DolphinBisectTool
 {
     public partial class MainWindow : Form
     {
-        Backend m_backend = new Backend();
+        private readonly Backend m_backend;
 
         public MainWindow()
         {
             InitializeComponent();
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 
+            m_backend = new Backend(this);
             download_label.Text = "Downloading build index";
             download_label.Visible = true;
 
@@ -78,22 +79,21 @@ namespace DolphinBisectTool
 
             if (radio_stable.Checked && boot_title.Checked)
             {
-                m_backend.SetSettings(-1, second_dev_build.SelectedIndex, file_path_textbox.Text,
-                                      this);
+                m_backend.SetSettings(-1, second_dev_build.SelectedIndex, file_path_textbox.Text);
             }
             else if (radio_stable.Checked)
             {
-                m_backend.SetSettings(-1, second_dev_build.SelectedIndex, this);
+                m_backend.SetSettings(-1, second_dev_build.SelectedIndex);
             }
             else if (!radio_stable.Checked && boot_title.Checked)
             {
                 m_backend.SetSettings(first_dev_build.SelectedIndex,
-                                    second_dev_build.SelectedIndex, file_path_textbox.Text, this);
+                    second_dev_build.SelectedIndex, file_path_textbox.Text);
             }
             else
             {
                 m_backend.SetSettings(first_dev_build.SelectedIndex,
-                                    second_dev_build.SelectedIndex, this);
+                    second_dev_build.SelectedIndex);
             }
 
             start_button.Enabled = false;

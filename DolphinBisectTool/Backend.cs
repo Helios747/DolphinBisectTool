@@ -19,10 +19,11 @@ namespace DolphinBisectTool
         // Follow this format: (Major).0
         public static string s_major_version = "4.0";
         public List<int> m_build_list = new List<int>();
-        MainWindow m_form;
+        private readonly MainWindow m_form;
 
-        public Backend()
+        public Backend(MainWindow form)
         {
+            m_form = form;
             // TODO - Replace this lib with SharpCompress
             SevenZipBase.SetLibraryPath(@"7z.dll");
         }
@@ -77,19 +78,17 @@ namespace DolphinBisectTool
             m_title = "";
         }
 
-        public void SetSettings(int first, int second, MainWindow f)
+        public void SetSettings(int first, int second)
         {
             m_min = first;
             m_max = second;
-            m_form = f;
         }
 
-        public void SetSettings(int first, int second, string path, MainWindow f)
+        public void SetSettings(int first, int second, string path)
         {
             m_min = first;
             m_max = second;
             m_title = path;
-            m_form = f;
         }
 
         public void DownloadBuildList()
