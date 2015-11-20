@@ -152,8 +152,8 @@ namespace DolphinBisectTool
             {
                 client.DownloadProgressChanged += (s, e) =>
                 {
-                    m_form.ChangeProgressBar(e.ProgressPercentage, "Downloading build " +
-                                             m_build_list.ElementAt(index));
+                    m_form.ChangeProgressBar(e.ProgressPercentage,
+                        string.Format("Downloading build {0}-{1}", s_major_version, m_build_list[index]));
                 };
 
                 client.DownloadFileCompleted += (s, e) =>
