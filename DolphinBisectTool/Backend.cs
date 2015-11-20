@@ -94,8 +94,22 @@ namespace DolphinBisectTool
         public void DownloadBuildList()
         {
             using (WebClient client = new WebClient())
-                client.DownloadFile(new Uri("https://dl.dolphin-emu.org/builds/"),
+            using (var download_finished = new ManualResetEvent(false))
+            {
+                client.DownloadProgressChanged += (s, e) =>
+                {
+                    m_form.ChangeProgressBar(e.ProgressPercentage, "Downloading build index");
+                };
+
+                client.DownloadFileCompleted += (s, e) =>
+                {
+                    download_finished.Set();
+                };
+
+                client.DownloadFileAsync(new Uri("https://dl.dolphin-emu.org/builds/"),
                          "buildindex");
+                download_finished.WaitOne();
+            }
         }
 
         public void ProcessBuildList()
