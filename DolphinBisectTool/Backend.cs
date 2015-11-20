@@ -1,12 +1,12 @@
-﻿using SevenZip;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
+using SevenZip;
 
 namespace DolphinBisectTool
 {
@@ -17,12 +17,12 @@ namespace DolphinBisectTool
         string m_title = "";
         // Follow this format: (Major).0
         public static string s_major_version = "4.0";
-        bool m_download_complete = false;
         public List<int> m_build_list = new List<int>();
-        MainWindow m_form;
+        private readonly MainWindow m_form;
 
-        public Backend()
+        public Backend(MainWindow form)
         {
+            m_form = form;
             // TODO - Replace this lib with SharpCompress
             SevenZipBase.SetLibraryPath(@"7z.dll");
         }
@@ -42,12 +42,12 @@ namespace DolphinBisectTool
                 else
                     index = (m_min + m_max) / 2;
 
-                DownloadBuild(base_url + "-" + m_build_list.ElementAt(index) +
+                DownloadBuild(base_url + "-" + m_build_list[index] +
                               "-x64.7z", index);
                 RunBuild();
 
                 DialogResult dialog_result = MessageBox.Show("Testing build " +
-                             m_build_list.ElementAt(index) + ". Does the issue appear?",
+                             s_major_version + "-" + m_build_list[index] + ". Did the issue appear?",
                              "Notice", MessageBoxButtons.YesNoCancel);
 
                 if (dialog_result == DialogResult.Yes)
@@ -65,7 +65,7 @@ namespace DolphinBisectTool
                 }
             }
 
-            int broken_build = (m_build_list.ElementAt(index) + 1);
+            int broken_build = (m_build_list[index] + 1);
             DialogResult show_build_page =
                          MessageBox.Show("Build " + s_major_version + "-" + broken_build +
                                          " may be the cause of your issue. " +
@@ -77,26 +77,38 @@ namespace DolphinBisectTool
             m_title = "";
         }
 
-        public void SetSettings(int first, int second, MainWindow f)
+        public void SetSettings(int first, int second)
         {
             m_min = first;
             m_max = second;
-            m_form = f;
         }
 
-        public void SetSettings(int first, int second, string path, MainWindow f)
+        public void SetSettings(int first, int second, string path)
         {
             m_min = first;
             m_max = second;
             m_title = path;
-            m_form = f;
         }
 
         public void DownloadBuildList()
         {
             using (WebClient client = new WebClient())
-                client.DownloadFile(new Uri("https://dl.dolphin-emu.org/builds/"),
+            using (var download_finished = new ManualResetEvent(false))
+            {
+                client.DownloadProgressChanged += (s, e) =>
+                {
+                    m_form.ChangeProgressBar(e.TotalBytesToReceive > 0 ? e.ProgressPercentage : -1, "Downloading build index");
+                };
+
+                client.DownloadFileCompleted += (s, e) =>
+                {
+                    download_finished.Set();
+                };
+
+                client.DownloadFileAsync(new Uri("https://dl.dolphin-emu.org/builds/"),
                          "buildindex");
+                download_finished.WaitOne();
+            }
         }
 
         public void ProcessBuildList()
@@ -135,31 +147,27 @@ namespace DolphinBisectTool
             }
 
             using (WebClient client = new WebClient())
+            using (var download_finished = new ManualResetEvent(false))
             {
-                client.DownloadFileAsync(new Uri(url), "dolphin.7z");
-
                 client.DownloadProgressChanged += (s, e) =>
                 {
-                    m_form.ChangeProgressBar(e.ProgressPercentage, "Downloading build " +
-                                             m_build_list.ElementAt(index));
+                    m_form.ChangeProgressBar(e.ProgressPercentage,
+                        string.Format("Downloading build {0}-{1}", s_major_version, m_build_list[index]));
                 };
 
                 client.DownloadFileCompleted += (s, e) =>
                 {
                     // Known Bug: Sometimes the label doesn't get updated before it extracts and
                     // launches. I want to blame this meh-level 7z lib blocking something.
-                    m_form.ChangeProgressBar(0, "Extracting and launching");
                     SevenZipExtractor dolphin_zip = new SevenZipExtractor(@"dolphin.7z");
+                    dolphin_zip.Extracting += (sender, eventArgs) => m_form.ChangeProgressBar(eventArgs.PercentDone, "Extracting and launching");
                     dolphin_zip.ExtractArchive("dolphin");
-                    m_download_complete = true;
+                    download_finished.Set();
                 };
-            }
 
-            while (!m_download_complete)
-            {
-                Application.DoEvents();
+                client.DownloadFileAsync(new Uri(url), "dolphin.7z");
+                download_finished.WaitOne();
             }
-            m_download_complete = false;
         }
 
         private void RunBuild()
@@ -169,8 +177,8 @@ namespace DolphinBisectTool
                 runner.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory() +
                                                     @"\dolphin\Dolphin-x64\";
                 runner.StartInfo.FileName = "Dolphin.exe";
-                if (!m_title.Equals(""))
-                    runner.StartInfo.Arguments = "/b /e " + "\"" + m_title + "\"";
+                if (!string.IsNullOrEmpty(m_title))
+                    runner.StartInfo.Arguments = string.Format("/b /e \"{0}\"", m_title);
                 runner.Start();
                 runner.WaitForExit();
             }

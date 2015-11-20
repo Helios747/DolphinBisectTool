@@ -7,13 +7,14 @@ namespace DolphinBisectTool
 {
     public partial class MainWindow : Form
     {
-        Backend m_backend = new Backend();
+        private readonly Backend m_backend;
 
         public MainWindow()
         {
             InitializeComponent();
-            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
 
+            m_backend = new Backend(this);
             download_label.Text = "Downloading build index";
             download_label.Visible = true;
 
@@ -65,7 +66,7 @@ namespace DolphinBisectTool
                 return;
             }
 
-            if (boot_title.Checked && file_path_textbox.Text.Equals(""))
+            if (boot_title.Checked && string.IsNullOrEmpty(file_path_textbox.Text))
             {
                 MessageBox.Show("Boot title enabled with no game / title selected",
                                 "Error", MessageBoxButtons.OK);
@@ -78,37 +79,55 @@ namespace DolphinBisectTool
 
             if (radio_stable.Checked && boot_title.Checked)
             {
-                m_backend.SetSettings(-1, second_dev_build.SelectedIndex, file_path_textbox.Text,
-                                      this);
-                m_backend.Run();
+                m_backend.SetSettings(-1, second_dev_build.SelectedIndex, file_path_textbox.Text);
             }
             else if (radio_stable.Checked)
             {
-                m_backend.SetSettings(-1, second_dev_build.SelectedIndex, this);
-                m_backend.Run();
+                m_backend.SetSettings(-1, second_dev_build.SelectedIndex);
             }
             else if (!radio_stable.Checked && boot_title.Checked)
             {
                 m_backend.SetSettings(first_dev_build.SelectedIndex,
-                                    second_dev_build.SelectedIndex, file_path_textbox.Text, this);
-                m_backend.Run();
+                    second_dev_build.SelectedIndex, file_path_textbox.Text);
             }
             else
             {
                 m_backend.SetSettings(first_dev_build.SelectedIndex,
-                                    second_dev_build.SelectedIndex, this);
-                m_backend.Run();
+                    second_dev_build.SelectedIndex);
             }
+
+            start_button.Enabled = false;
+            var testWorker = new BackgroundWorker();
+            testWorker.DoWork += (s, ea) => m_backend.Run();
+            testWorker.RunWorkerCompleted += (s, ea) => start_button.Enabled = true;
+            testWorker.RunWorkerAsync();
         }
         
         public void ChangeProgressBar(int v, string t)
         {
+            // pass the call to the UI thread if necessary
+            if (InvokeRequired)
+            {
+                Invoke(new Action<int, string>(ChangeProgressBar), v, t);
+                return;
+            }
+
             if (v != 100)
             {
                 download_bar.Visible = true;
                 download_label.Text = t;
                 download_label.Visible = true;
-                download_bar.Value = v;
+
+                // accept -1 as indicator that we don't know the progress
+                if (v == -1)
+                {
+                    download_bar.Style = ProgressBarStyle.Marquee;
+                }
+                else
+                {
+                    download_bar.Style = ProgressBarStyle.Continuous;
+                    download_bar.Value = v;
+                }
             }
             else
             {
