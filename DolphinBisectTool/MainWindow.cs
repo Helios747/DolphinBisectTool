@@ -96,8 +96,10 @@ namespace DolphinBisectTool
                                     second_dev_build.SelectedIndex, this);
             }
 
+            start_button.Enabled = false;
             var testWorker = new BackgroundWorker();
             testWorker.DoWork += (s, ea) => m_backend.Run();
+            testWorker.RunWorkerCompleted += (s, ea) => start_button.Enabled = true;
             testWorker.RunWorkerAsync();
         }
         
