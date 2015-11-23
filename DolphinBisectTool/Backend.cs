@@ -37,10 +37,8 @@ namespace DolphinBisectTool
             {
                 // TODO - Find a better way to test against stable. Preferably one that allows for
                 // different stables to be tested.
-                if (m_min == -1)
-                    index = (0 + m_max) / 2;
-                else
-                    index = (m_min + m_max) / 2;
+
+                index = m_min == -1 ? (0 + m_max) / 2 : (m_min + m_max) / 2;
 
                 DownloadBuild(base_url + "-" + m_build_list[index] +
                               "-x64.7z", index);
@@ -122,9 +120,10 @@ namespace DolphinBisectTool
                 while ((current_line = reader.ReadLine()) != null)
                 {
                     int stripped_build_num;
-                    int.TryParse(regex.Match(current_line).Value, out stripped_build_num);
-                    if (stripped_build_num != 0)
+                    if (int.TryParse(regex.Match(current_line).Value, out stripped_build_num))
+                    {
                         result.Add(stripped_build_num);
+                    }
                 }
 
                 result.Sort();
