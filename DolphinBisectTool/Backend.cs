@@ -6,7 +6,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
-using SevenZip;
+using SharpCompress.Archive;
 
 namespace DolphinBisectTool
 {
@@ -16,15 +16,13 @@ namespace DolphinBisectTool
         int m_max;
         string m_title = "";
         // Follow this format: (Major).0
-        public static string s_major_version = "4.0";
+        public readonly static string s_major_version = "4.0";
         public List<int> m_build_list = new List<int>();
         private readonly MainWindow m_form;
 
         public Backend(MainWindow form)
         {
             m_form = form;
-            // TODO - Replace this lib with SharpCompress
-            SevenZipBase.SetLibraryPath(@"7z.dll");
         }
 
         public void Run()
@@ -156,12 +154,13 @@ namespace DolphinBisectTool
 
                 client.DownloadFileCompleted += (s, e) =>
                 {
-                    // Known Bug: Sometimes the label doesn't get updated before it extracts and
-                    // launches. I want to blame this meh-level 7z lib blocking something.
-                    SevenZipExtractor dolphin_zip = new SevenZipExtractor(@"dolphin.7z");
-                    dolphin_zip.Extracting += (sender, eventArgs) => m_form.ChangeProgressBar(eventArgs.PercentDone, "Extracting and launching");
-                    dolphin_zip.ExtractArchive("dolphin");
-                    download_finished.Set();
+                    using (var stream = File.OpenRead(@"dolphin.7z"))
+                    using (var archive = ArchiveFactory.Open(stream))
+                    {
+                        archive.CompressedBytesRead += (sender, eventArgs) => m_form.ChangeProgressBar((int)((100L * (stream.Length - (stream.Length - stream.Position))) / stream.Length), "Extracting and launching");
+                        archive.WriteToDirectory("dolphin", SharpCompress.Common.ExtractOptions.ExtractFullPath);
+                        download_finished.Set();
+                    }
                 };
 
                 client.DownloadFileAsync(new Uri(url), "dolphin.7z");
