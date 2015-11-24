@@ -157,7 +157,7 @@ namespace DolphinBisectTool
                     using (var stream = File.OpenRead(@"dolphin.7z"))
                     using (var archive = ArchiveFactory.Open(stream))
                     {
-                        archive.CompressedBytesRead += (sender, eventArgs) => m_form.ChangeProgressBar((int)(eventArgs.CurrentFilePartCompressedBytesRead % 100), "Extracting and launching");
+                        archive.CompressedBytesRead += (sender, eventArgs) => m_form.ChangeProgressBar((int)((100L * (stream.Length - (stream.Length - stream.Position))) / stream.Length), "Extracting and launching");
                         archive.WriteToDirectory("dolphin", SharpCompress.Common.ExtractOptions.ExtractFullPath);
                         download_finished.Set();
                     }
