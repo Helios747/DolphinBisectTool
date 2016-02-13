@@ -7,127 +7,69 @@ namespace DolphinBisectTool
 {
     public partial class MainWindow : Form
     {
-        private readonly Backend m_backend;
+        // Follow this format: (Major).0
+        static string s_major_version = "4.0";
+        int m_first_dev = 0;
+        int m_second_dev = 0;
+        DownloadBuildList m_download_build_list = new DownloadBuildList();
+        DownloadBuild m_download_build = new DownloadBuild();
+        Bisect m_bisect = new Bisect();
 
         public MainWindow()
         {
             InitializeComponent();
             FormBorderStyle = FormBorderStyle.FixedSingle;
 
-            m_backend = new Backend(this);
+            m_bisect.BisectEvent += BisectUserDialog;
+            m_download_build_list.UpdateProgress += ChangeProgressBar;
+            m_download_build.UpdateProgress += ChangeProgressBar;
+
             download_label.Text = "Downloading build index";
             download_label.Visible = true;
 
-            BackgroundWorker bw = new BackgroundWorker();
-            bw.DoWork += PostLoadTasks;
-            bw.RunWorkerCompleted += PostLoadTasksCompleted;
-            bw.RunWorkerAsync();
+            m_download_build_list.Download();
         }
 
-        private void PostLoadTasks(object sender, DoWorkEventArgs e)
+        private void BisectUserDialog(int build, bool final_trigger)
         {
-            m_backend.DownloadBuildList();
-            m_backend.ProcessBuildList();
+            DialogResult result = MessageBox.Show("Testing build " + build, "Bisect", MessageBoxButtons.YesNoCancel);
+            //unfinished
         }
 
-        private void PostLoadTasksCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void browse_button_Click(object sender, EventArgs e)
         {
-            PopulateComboBoxes(m_backend.m_build_list);
-        }
-
-        private void btnBrowse_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog fd = new OpenFileDialog();
-            fd.Filter = "All GC/Wii Files|*.elf; *.dol; *.gcm; *.iso;" +
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "All GC/Wii Files|*.elf; *.dol; *.gcm; *.iso;" +
                         "*.wbfs; *.ciso; *.gcz; *.wad| All Files (*.*)|*.*";
-            if (fd.ShowDialog() == DialogResult.OK)
+            if (dialog.ShowDialog() == DialogResult.OK)
             {
-                file_path_textbox.Text = fd.FileName;
+                file_path_textbox.Text = dialog.FileName;
                 boot_title.Checked = true;
             }
         }
 
-        private void btnStart_Click(object sender, EventArgs e)
+        private void start_button_Click(object sender, EventArgs e)
         {
-            string title;
-
-            if (first_dev_build.SelectedIndex == second_dev_build.SelectedIndex ||
-                (radio_stable.Checked && second_dev_build.SelectedIndex == 0))
-            {
-                MessageBox.Show("Selected builds cannot be the same",
-                                "Error", MessageBoxButtons.OK);
-                return;
-            }
-
-            if (first_dev_build.SelectedIndex >= second_dev_build.SelectedIndex)
-            {
-                MessageBox.Show("First build cannot be newer than second",
-                                "Error", MessageBoxButtons.OK);
-                return;
-            }
-
-            if (boot_title.Checked && string.IsNullOrEmpty(file_path_textbox.Text))
-            {
-                MessageBox.Show("Boot title enabled with no game / title selected",
-                                "Error", MessageBoxButtons.OK);
-                return;
-            }
-            else
-            {
-                title = file_path_textbox.Text;
-            }
-
-            if (radio_stable.Checked && boot_title.Checked)
-            {
-                m_backend.SetSettings(-1, second_dev_build.SelectedIndex, file_path_textbox.Text);
-            }
-            else if (radio_stable.Checked)
-            {
-                m_backend.SetSettings(-1, second_dev_build.SelectedIndex);
-            }
-            else if (!radio_stable.Checked && boot_title.Checked)
-            {
-                m_backend.SetSettings(first_dev_build.SelectedIndex,
-                    second_dev_build.SelectedIndex, file_path_textbox.Text);
-            }
-            else
-            {
-                m_backend.SetSettings(first_dev_build.SelectedIndex,
-                    second_dev_build.SelectedIndex);
-            }
-
             start_button.Enabled = false;
-            var testWorker = new BackgroundWorker();
-            testWorker.DoWork += (s, ea) => m_backend.Run();
-            testWorker.RunWorkerCompleted += (s, ea) => start_button.Enabled = true;
-            testWorker.RunWorkerAsync();
+            //unfinished
         }
-        
-        public void ChangeProgressBar(int v, string t)
-        {
-            // pass the call to the UI thread if necessary
-            if (InvokeRequired)
-            {
-                Invoke(new Action<int, string>(ChangeProgressBar), v, t);
-                return;
-            }
 
-            if (v != 100)
+        public void ChangeProgressBar(int value, string text, ProgressBarStyle style)
+        {
+            if (value != 100)
             {
                 download_bar.Visible = true;
-                download_label.Text = t;
+                download_label.Text = text;
                 download_label.Visible = true;
-
-                // accept -1 as indicator that we don't know the progress
-                if (v == -1)
-                {
-                    download_bar.Style = ProgressBarStyle.Marquee;
-                }
-                else
-                {
-                    download_bar.Style = ProgressBarStyle.Continuous;
-                    download_bar.Value = v;
-                }
+                download_bar.Style = style;
+            }
+            else if (value == 100 && text.Equals("Parsing build list"))
+            {
+                download_label.Text = text;
+                download_bar.Style = style;
+                ProcessBuildList process_build = new ProcessBuildList();
+                List<int> build_list = process_build.Run(s_major_version);
+                PopulateComboBoxes(build_list);
             }
             else
             {
@@ -136,12 +78,12 @@ namespace DolphinBisectTool
             }
         }
 
-        private void PopulateComboBoxes(List<int> l)
+        private void PopulateComboBoxes(List<int> list)
         {
-            foreach (int i in l)
+            foreach (int i in list)
             {
-                first_dev_build.Items.Add(Backend.s_major_version + "-" + i);
-                second_dev_build.Items.Add(Backend.s_major_version + "-" + i);
+                first_dev_build.Items.Add(s_major_version + "-" + i);
+                second_dev_build.Items.Add(s_major_version + "-" + i);
             }
 
             first_dev_build.SelectedIndex = 0;
@@ -184,6 +126,16 @@ namespace DolphinBisectTool
                 first_dev_build.Enabled = true;
                 first_dev_build.Visible = true;
             }
+        }
+
+        private void first_dev_build_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            m_first_dev = first_dev_build.SelectedIndex;
+        }
+
+        private void second_dev_build_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            m_second_dev = second_dev_build.SelectedIndex;
         }
     }
 }
