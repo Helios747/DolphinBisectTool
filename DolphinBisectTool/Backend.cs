@@ -19,12 +19,12 @@ namespace DolphinBisectTool
 
     class Backend
     {
-        internal delegate void BisectEventDelegate(int build, bool final_trigger = false);
+        internal delegate UserInput BisectEventDelegate(int build, bool final_trigger = false);
         internal event BisectEventDelegate BisectEvent;
 
         int m_first_index;
         int m_second_index;
-        string m_major_version;
+        public string m_major_version;
         List<int> m_build_list;
         
         public Backend(int first_index, int second_index, List<int> build_list, string major_version)
@@ -37,7 +37,7 @@ namespace DolphinBisectTool
 
         public void Bisect(string boot_title = "")
         {
-            string base_url = "https://dl.dolphin-emu.org/builds/dolphin-master-" + m_major_version;
+            string base_url = "https://dl.dolphin-emu.org/builds/dolphin-master-" + m_major_version + "-";
             int test_index = 0;
             RunBuild run_build = new RunBuild();
             DownloadBuild download_build = new DownloadBuild();
@@ -47,7 +47,7 @@ namespace DolphinBisectTool
 
                 test_index = m_first_index == -1 ? (0 + m_second_index) / 2 : (m_first_index + m_second_index) / 2;
 
-                download_build.Download(base_url + m_build_list[test_index], m_major_version, m_build_list[test_index]);
+                download_build.Download(base_url + m_build_list[test_index] + "-x64.7z", m_major_version, m_build_list[test_index]);
 
                 if (!string.IsNullOrEmpty(boot_title))
                     run_build.Run(boot_title);
@@ -56,9 +56,20 @@ namespace DolphinBisectTool
 
                 UserInput return_val = BisectEvent(test_index);
 
+                if (return_val == UserInput.Yes)
+                    m_second_index = test_index - 1;
+                else if (return_val == UserInput.No)
+                    m_first_index = test_index + 1;
+                else
+                    return;
+
             }
 
-
+            UserInput open_url = BisectEvent(test_index, true);
+            if (open_url == UserInput.Yes)
+            {
+                Process.Start("https://dolp.in/" + m_major_version + "-" + m_build_list[test_index+1]);
+            }
         }
     }
 }

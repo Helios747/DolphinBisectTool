@@ -31,8 +31,15 @@ namespace DolphinBisectTool
 
         private UserInput BisectUserDialog(int build, bool final_trigger)
         {
-            DialogResult result = MessageBox.Show("Tested build " + build + ". Did the bug happen in this build?",
-                                                  "Bisect", MessageBoxButtons.YesNoCancel);
+
+            DialogResult result;
+            if (!final_trigger)
+               result = MessageBox.Show("Tested build " + s_major_version + "-" + build_list[build] + ". Did the bug happen in this build?",
+                                        "Bisect", MessageBoxButtons.YesNoCancel);
+            else
+                result = MessageBox.Show("Build " + s_major_version + "-" + build_list[build] + " may be the cause of your issue. " +
+                                         "Do you want to open the URL for that build?", "Notice",
+                                         MessageBoxButtons.YesNo);
             if (result == DialogResult.Yes)
                 return UserInput.Yes;
             else if (result == DialogResult.No)

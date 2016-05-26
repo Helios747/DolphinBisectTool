@@ -58,7 +58,7 @@ namespace DolphinBisectTool
                     dolphin_zip.ExtractArchive("dolphin");
                 };
 
-                client.DownloadFileAsync(new Uri(url), "dolphin.7z");
+                client.DownloadFile(new Uri(url), "dolphin.7z");
             }
         }
     }
