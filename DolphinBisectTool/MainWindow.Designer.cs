@@ -140,7 +140,6 @@
             this.first_dev_build.Name = "first_dev_build";
             this.first_dev_build.Size = new System.Drawing.Size(191, 21);
             this.first_dev_build.TabIndex = 25;
-            this.first_dev_build.SelectedIndexChanged += new System.EventHandler(this.first_dev_build_SelectedIndexChanged);
             // 
             // second_dev_build
             // 
@@ -150,7 +149,6 @@
             this.second_dev_build.Name = "second_dev_build";
             this.second_dev_build.Size = new System.Drawing.Size(191, 21);
             this.second_dev_build.TabIndex = 26;
-            this.second_dev_build.SelectedIndexChanged += new System.EventHandler(this.second_dev_build_SelectedIndexChanged);
             // 
             // first_stable_label
             // 

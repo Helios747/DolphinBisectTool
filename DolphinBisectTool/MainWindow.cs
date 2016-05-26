@@ -7,10 +7,11 @@ namespace DolphinBisectTool
 {
     public partial class MainWindow : Form
     {
-        int m_first_dev = 0;
-        int m_second_dev = 0;
-        // TODO - get rid of this variable so I stop bouncing it through the code.
+
+        // TODO - get rid of these two variables so I stop bouncing it through the code.
         List<int> build_list;
+        static string s_major_version = "4.0";
+
         DownloadBuildList m_download_build_list = new DownloadBuildList();
         DownloadBuild m_download_build = new DownloadBuild();
 
@@ -28,11 +29,17 @@ namespace DolphinBisectTool
             m_download_build_list.Download();
         }
 
-        private void BisectUserDialog(int build, bool final_trigger)
+        private UserInput BisectUserDialog(int build, bool final_trigger)
         {
             DialogResult result = MessageBox.Show("Tested build " + build + ". Did the bug happen in this build?",
                                                   "Bisect", MessageBoxButtons.YesNoCancel);
-            //unfinished - How do I get input from the user here back into the bisect function in Backend.cs
+            if (result == DialogResult.Yes)
+                return UserInput.Yes;
+            else if (result == DialogResult.No)
+                return UserInput.No;
+            else
+                return UserInput.Cancel;
+
         }
 
         private void browse_button_Click(object sender, EventArgs e)
@@ -58,7 +65,7 @@ namespace DolphinBisectTool
             else
                 first_build = first_dev_build.SelectedIndex;
 
-            Backend backend = new Backend(first_build, second_dev_build.SelectedIndex, build_list);
+            Backend backend = new Backend(first_build, second_dev_build.SelectedIndex, build_list, s_major_version);
             backend.BisectEvent += BisectUserDialog;
 
             if (boot_title.Checked)
@@ -132,16 +139,6 @@ namespace DolphinBisectTool
                 first_dev_build.Enabled = true;
                 first_dev_build.Visible = true;
             }
-        }
-
-        private void first_dev_build_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            m_first_dev = first_dev_build.SelectedIndex;
-        }
-
-        private void second_dev_build_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            m_second_dev = second_dev_build.SelectedIndex;
         }
     }
 }
