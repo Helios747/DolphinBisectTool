@@ -7,20 +7,18 @@ namespace DolphinBisectTool
 {
     public partial class MainWindow : Form
     {
-        // Follow this format: (Major).0
-        static string s_major_version = "4.0";
         int m_first_dev = 0;
         int m_second_dev = 0;
+        // TODO - get rid of this variable so I stop bouncing it through the code.
+        List<int> build_list;
         DownloadBuildList m_download_build_list = new DownloadBuildList();
         DownloadBuild m_download_build = new DownloadBuild();
-        Bisect m_bisect = new Bisect();
 
         public MainWindow()
         {
             InitializeComponent();
             FormBorderStyle = FormBorderStyle.FixedSingle;
 
-            m_bisect.BisectEvent += BisectUserDialog;
             m_download_build_list.UpdateProgress += ChangeProgressBar;
             m_download_build.UpdateProgress += ChangeProgressBar;
 
@@ -32,8 +30,9 @@ namespace DolphinBisectTool
 
         private void BisectUserDialog(int build, bool final_trigger)
         {
-            DialogResult result = MessageBox.Show("Testing build " + build, "Bisect", MessageBoxButtons.YesNoCancel);
-            //unfinished
+            DialogResult result = MessageBox.Show("Tested build " + build + ". Did the bug happen in this build?",
+                                                  "Bisect", MessageBoxButtons.YesNoCancel);
+            //unfinished - How do I get input from the user here back into the bisect function in Backend.cs
         }
 
         private void browse_button_Click(object sender, EventArgs e)
@@ -48,10 +47,25 @@ namespace DolphinBisectTool
             }
         }
 
+        // Not the biggest fan of this implementation
         private void start_button_Click(object sender, EventArgs e)
         {
             start_button.Enabled = false;
-            //unfinished
+            int first_build;
+
+            if (radio_stable.Checked)
+                first_build = 0;
+            else
+                first_build = first_dev_build.SelectedIndex;
+
+            Backend backend = new Backend(first_build, second_dev_build.SelectedIndex, build_list);
+            backend.BisectEvent += BisectUserDialog;
+
+            if (boot_title.Checked)
+                backend.Bisect(file_path_textbox.Text);
+            else
+                backend.Bisect();   
+
         }
 
         public void ChangeProgressBar(int value, string text, ProgressBarStyle style)
@@ -68,7 +82,7 @@ namespace DolphinBisectTool
                 download_label.Text = text;
                 download_bar.Style = style;
                 ProcessBuildList process_build = new ProcessBuildList();
-                List<int> build_list = process_build.Run(s_major_version);
+                build_list = process_build.Run(s_major_version);
                 PopulateComboBoxes(build_list);
             }
             else
@@ -93,17 +107,9 @@ namespace DolphinBisectTool
 
         private void EnableUI()
         {
-            radio_stable.Select();
-            first_build_label.Enabled = true;
-            second_build_label.Enabled = true;
-            second_dev_build.Enabled = true;
-            boot_title.Enabled = true;
-            file_path_textbox.Enabled = true;
-            browse_button.Enabled = true;
-            start_button.Enabled = true;
-            radio_development.Enabled = true;
-            radio_stable.Enabled = true;
+            Enabled = true;
             download_label.Visible = false;
+            radio_stable.Select();
         }
 
         private void rbFirstStable_CheckedChanged(object sender, EventArgs e)

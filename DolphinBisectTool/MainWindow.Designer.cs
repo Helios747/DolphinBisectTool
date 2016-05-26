@@ -48,64 +48,54 @@
             // first_build_label
             // 
             this.first_build_label.AutoSize = true;
-            this.first_build_label.Enabled = false;
-            this.first_build_label.Location = new System.Drawing.Point(16, 11);
-            this.first_build_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.first_build_label.Location = new System.Drawing.Point(12, 9);
             this.first_build_label.Name = "first_build_label";
-            this.first_build_label.Size = new System.Drawing.Size(408, 17);
+            this.first_build_label.Size = new System.Drawing.Size(304, 13);
             this.first_build_label.TabIndex = 0;
             this.first_build_label.Text = "Select a stable or development build before the issue appeared";
             // 
             // second_build_label
             // 
             this.second_build_label.AutoSize = true;
-            this.second_build_label.Enabled = false;
-            this.second_build_label.Location = new System.Drawing.Point(16, 110);
-            this.second_build_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.second_build_label.Location = new System.Drawing.Point(12, 89);
             this.second_build_label.Name = "second_build_label";
-            this.second_build_label.Size = new System.Drawing.Size(348, 17);
+            this.second_build_label.Size = new System.Drawing.Size(263, 13);
             this.second_build_label.TabIndex = 1;
             this.second_build_label.Text = "Select the development build where you saw the issue";
             // 
             // boot_title
             // 
             this.boot_title.AutoSize = true;
-            this.boot_title.Enabled = false;
-            this.boot_title.Location = new System.Drawing.Point(24, 206);
-            this.boot_title.Margin = new System.Windows.Forms.Padding(4);
+            this.boot_title.Location = new System.Drawing.Point(18, 167);
             this.boot_title.Name = "boot_title";
-            this.boot_title.Size = new System.Drawing.Size(85, 21);
+            this.boot_title.Size = new System.Drawing.Size(67, 17);
             this.boot_title.TabIndex = 9;
             this.boot_title.Text = "Boot title";
             this.boot_title.UseVisualStyleBackColor = true;
             // 
             // file_path_textbox
             // 
-            this.file_path_textbox.Enabled = false;
-            this.file_path_textbox.Location = new System.Drawing.Point(185, 201);
-            this.file_path_textbox.Margin = new System.Windows.Forms.Padding(4);
+            this.file_path_textbox.Location = new System.Drawing.Point(139, 163);
             this.file_path_textbox.Name = "file_path_textbox";
-            this.file_path_textbox.Size = new System.Drawing.Size(253, 22);
+            this.file_path_textbox.Size = new System.Drawing.Size(191, 20);
             this.file_path_textbox.TabIndex = 10;
             // 
             // radio_group
             // 
             this.radio_group.Controls.Add(this.radio_development);
             this.radio_group.Controls.Add(this.radio_stable);
-            this.radio_group.Location = new System.Drawing.Point(20, 32);
-            this.radio_group.Margin = new System.Windows.Forms.Padding(4);
+            this.radio_group.Location = new System.Drawing.Point(15, 26);
             this.radio_group.Name = "radio_group";
-            this.radio_group.Size = new System.Drawing.Size(152, 74);
+            this.radio_group.Size = new System.Drawing.Size(114, 60);
             this.radio_group.TabIndex = 15;
             // 
             // radio_development
             // 
             this.radio_development.AutoSize = true;
             this.radio_development.Enabled = false;
-            this.radio_development.Location = new System.Drawing.Point(5, 34);
-            this.radio_development.Margin = new System.Windows.Forms.Padding(4);
+            this.radio_development.Location = new System.Drawing.Point(4, 28);
             this.radio_development.Name = "radio_development";
-            this.radio_development.Size = new System.Drawing.Size(112, 21);
+            this.radio_development.Size = new System.Drawing.Size(88, 17);
             this.radio_development.TabIndex = 1;
             this.radio_development.TabStop = true;
             this.radio_development.Text = "Development";
@@ -115,11 +105,9 @@
             // radio_stable
             // 
             this.radio_stable.AutoSize = true;
-            this.radio_stable.Enabled = false;
-            this.radio_stable.Location = new System.Drawing.Point(5, 5);
-            this.radio_stable.Margin = new System.Windows.Forms.Padding(4);
+            this.radio_stable.Location = new System.Drawing.Point(4, 4);
             this.radio_stable.Name = "radio_stable";
-            this.radio_stable.Size = new System.Drawing.Size(69, 21);
+            this.radio_stable.Size = new System.Drawing.Size(55, 17);
             this.radio_stable.TabIndex = 0;
             this.radio_stable.TabStop = true;
             this.radio_stable.Text = "Stable";
@@ -128,20 +116,18 @@
             // 
             // download_bar
             // 
-            this.download_bar.Location = new System.Drawing.Point(25, 270);
-            this.download_bar.Margin = new System.Windows.Forms.Padding(4);
+            this.download_bar.Location = new System.Drawing.Point(19, 219);
             this.download_bar.Name = "download_bar";
-            this.download_bar.Size = new System.Drawing.Size(307, 28);
+            this.download_bar.Size = new System.Drawing.Size(230, 23);
             this.download_bar.TabIndex = 17;
             this.download_bar.Visible = false;
             // 
             // download_label
             // 
             this.download_label.AutoSize = true;
-            this.download_label.Location = new System.Drawing.Point(21, 246);
-            this.download_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.download_label.Location = new System.Drawing.Point(16, 200);
             this.download_label.Name = "download_label";
-            this.download_label.Size = new System.Drawing.Size(89, 17);
+            this.download_label.Size = new System.Drawing.Size(69, 13);
             this.download_label.TabIndex = 18;
             this.download_label.Text = "Downloading";
             this.download_label.Visible = false;
@@ -149,46 +135,38 @@
             // first_dev_build
             // 
             this.first_dev_build.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.first_dev_build.Enabled = false;
             this.first_dev_build.FormattingEnabled = true;
-            this.first_dev_build.Location = new System.Drawing.Point(185, 48);
-            this.first_dev_build.Margin = new System.Windows.Forms.Padding(4);
+            this.first_dev_build.Location = new System.Drawing.Point(139, 39);
             this.first_dev_build.Name = "first_dev_build";
-            this.first_dev_build.Size = new System.Drawing.Size(253, 24);
+            this.first_dev_build.Size = new System.Drawing.Size(191, 21);
             this.first_dev_build.TabIndex = 25;
             this.first_dev_build.SelectedIndexChanged += new System.EventHandler(this.first_dev_build_SelectedIndexChanged);
             // 
             // second_dev_build
             // 
             this.second_dev_build.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.second_dev_build.Enabled = false;
             this.second_dev_build.FormattingEnabled = true;
-            this.second_dev_build.Location = new System.Drawing.Point(185, 142);
-            this.second_dev_build.Margin = new System.Windows.Forms.Padding(4);
+            this.second_dev_build.Location = new System.Drawing.Point(139, 115);
             this.second_dev_build.Name = "second_dev_build";
-            this.second_dev_build.Size = new System.Drawing.Size(253, 24);
+            this.second_dev_build.Size = new System.Drawing.Size(191, 21);
             this.second_dev_build.TabIndex = 26;
             this.second_dev_build.SelectedIndexChanged += new System.EventHandler(this.second_dev_build_SelectedIndexChanged);
             // 
             // first_stable_label
             // 
             this.first_stable_label.AutoSize = true;
-            this.first_stable_label.Enabled = false;
-            this.first_stable_label.Location = new System.Drawing.Point(181, 48);
-            this.first_stable_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.first_stable_label.Location = new System.Drawing.Point(136, 39);
             this.first_stable_label.Name = "first_stable_label";
-            this.first_stable_label.Size = new System.Drawing.Size(46, 17);
+            this.first_stable_label.Size = new System.Drawing.Size(35, 13);
             this.first_stable_label.TabIndex = 27;
             this.first_stable_label.Text = "label3";
             this.first_stable_label.Visible = false;
             // 
             // browse_button
             // 
-            this.browse_button.Enabled = false;
-            this.browse_button.Location = new System.Drawing.Point(452, 198);
-            this.browse_button.Margin = new System.Windows.Forms.Padding(4);
+            this.browse_button.Location = new System.Drawing.Point(339, 161);
             this.browse_button.Name = "browse_button";
-            this.browse_button.Size = new System.Drawing.Size(100, 28);
+            this.browse_button.Size = new System.Drawing.Size(75, 23);
             this.browse_button.TabIndex = 29;
             this.browse_button.Text = "Browse";
             this.browse_button.UseVisualStyleBackColor = true;
@@ -196,11 +174,9 @@
             // 
             // start_button
             // 
-            this.start_button.Enabled = false;
-            this.start_button.Location = new System.Drawing.Point(452, 270);
-            this.start_button.Margin = new System.Windows.Forms.Padding(4);
+            this.start_button.Location = new System.Drawing.Point(339, 219);
             this.start_button.Name = "start_button";
-            this.start_button.Size = new System.Drawing.Size(100, 28);
+            this.start_button.Size = new System.Drawing.Size(75, 23);
             this.start_button.TabIndex = 28;
             this.start_button.Text = "Start";
             this.start_button.UseVisualStyleBackColor = true;
@@ -208,9 +184,9 @@
             // 
             // MainWindow
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(565, 313);
+            this.ClientSize = new System.Drawing.Size(424, 254);
             this.Controls.Add(this.browse_button);
             this.Controls.Add(this.start_button);
             this.Controls.Add(this.first_stable_label);
@@ -223,7 +199,7 @@
             this.Controls.Add(this.boot_title);
             this.Controls.Add(this.second_build_label);
             this.Controls.Add(this.first_build_label);
-            this.Margin = new System.Windows.Forms.Padding(4);
+            this.Enabled = false;
             this.MaximizeBox = false;
             this.Name = "MainWindow";
             this.Text = "Dolphin Bisect Tool";
