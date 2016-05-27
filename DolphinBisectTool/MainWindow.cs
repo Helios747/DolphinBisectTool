@@ -123,6 +123,7 @@ namespace DolphinBisectTool
         {
             Enabled = true;
             download_label.Visible = false;
+            radio_development.Enabled = true;
             radio_stable.Select();
         }
 
