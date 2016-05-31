@@ -71,14 +71,9 @@ namespace DolphinBisectTool
                 Process.Start("https://dolp.in/" + m_major_version + "-" + m_build_list[test_index+1]);
             }
         }
+
         public void Download(string url, string major_version, int version)
         {
-            WebClient client = new WebClient();
-            client.DownloadProgressChanged += (s, e) =>
-            {
-                UpdateProgress(e.ProgressPercentage, "Downloading build", ProgressBarStyle.Continuous);
-            };
-
             // Windows will throw an error if you have the folder you're trying to delete open in
             // explorer. It will remove the contents but error out on the folder removal. That's
             // good enough but this is just so it doesn't crash.
@@ -91,20 +86,27 @@ namespace DolphinBisectTool
             {
             }
 
-            client.DownloadFileAsync(new Uri(url), "dolphin.7z");
-
-            while (client.IsBusy)
+            using (WebClient client = new WebClient())
             {
-                Application.DoEvents();
+                client.DownloadProgressChanged += (s, e) =>
+                {
+                    UpdateProgress(e.ProgressPercentage, "Downloading build", ProgressBarStyle.Continuous);
+                };
+                client.DownloadFileAsync(new Uri(url), "dolphin.7z");
+
+                while (client.IsBusy)
+                {
+                    Application.DoEvents();
+                }
+
+                SevenZipExtractor dolphin_zip = new SevenZipExtractor(@"dolphin.7z");
+
+                dolphin_zip.Extracting += (sender, eventArgs) =>
+                {
+                    UpdateProgress(eventArgs.PercentDone, "Extracting and launching", ProgressBarStyle.Continuous);
+                };
+                dolphin_zip.ExtractArchive("dolphin");
             }
-
-            SevenZipExtractor dolphin_zip = new SevenZipExtractor(@"dolphin.7z");
-
-            dolphin_zip.Extracting += (sender, eventArgs) =>
-            {
-                UpdateProgress(eventArgs.PercentDone, "Extracting and launching", ProgressBarStyle.Continuous);
-            };
-            dolphin_zip.ExtractArchive("dolphin");
         }
     }
 }
