@@ -70,7 +70,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Backend.cs" />
-    <Compile Include="DownloadBuild.cs" />
     <Compile Include="DownloadBuildList.cs" />
     <Compile Include="MainWindow.cs">
       <SubType>Form</SubType>
