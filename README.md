@@ -10,7 +10,7 @@ To compile, Dolphin Bisect Tool was written and compiled in Visual Studio 2015. 
 Code clean ups, features, bug fixes, or anything else are greatly welcome. Just make a pull request. I would appreciate it if Dolphin's [contribution guidelines] (https://github.com/dolphin-emu/dolphin/blob/master/Contributing.md) were followed.
 
 # Contact
-Dolphin Bisect Tool was written by Anthony 'Helios' Serna. 
+Dolphin Bisect Tool was written by Anthony aka 'Helios'
 
 Discussion about the utility should be directed here:
 
