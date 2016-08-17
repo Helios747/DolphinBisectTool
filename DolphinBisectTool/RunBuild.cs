@@ -9,9 +9,10 @@ namespace DolphinBisectTool
         {
             using (var runner = new Process())
             {
-                runner.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory() +
-                                                    @"\dolphin\Dolphin-x64\";
-                runner.StartInfo.FileName = "Dolphin.exe";
+                string startingDirectory = Directory.GetCurrentDirectory() +
+                                           @"\dolphin\Dolphin-x64\";
+                runner.StartInfo.WorkingDirectory = startingDirectory;
+                runner.StartInfo.FileName = startingDirectory + "Dolphin.exe";
                 if (!string.IsNullOrEmpty(title))
                     runner.StartInfo.Arguments = string.Format("/b /e \"{0}\"", title);
                 runner.Start();
