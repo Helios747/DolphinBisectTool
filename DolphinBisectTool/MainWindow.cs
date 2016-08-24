@@ -8,7 +8,7 @@ namespace DolphinBisectTool
     {
 
         List<int> m_build_list;
-        static string s_major_version = "4.0";
+        static string s_major_version = "5.0";
 
         DownloadBuildList m_download_build_list = new DownloadBuildList();
 
