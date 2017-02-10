@@ -12,7 +12,7 @@ namespace DolphinBisectTool
             string starting_directory = Directory.GetCurrentDirectory() + @"\dolphin\Dolphin-x64\";                                                                                                    
             string[] files = Directory.GetFiles(starting_directory).Select(file =>
                              Path.GetFileName(file)).ToArray();
-            string pattern = @"(^Dolphin.*)";
+            string pattern = @"(^Dolphin(?!Qt).*)";
             var match = files.Where(path => Regex.Match(path, pattern).Success);
 
             using (var runner = new Process())
