@@ -25,20 +25,18 @@ namespace DolphinBisectTool
 
         int m_first_index;
         int m_second_index;
-        public string m_major_version;
-        List<int> m_build_list;
+        List<string> m_build_list;
 
-        public Backend(int first_index, int second_index, List<int> build_list, string major_version)
+        public Backend(int first_index, int second_index, List<string> build_list)
         {
             m_first_index = first_index;
             m_second_index = second_index;
             m_build_list = build_list;
-            m_major_version = major_version;
         }
 
         public void Bisect(string boot_title = "")
         {
-            string base_url = "https://dl.dolphin-emu.org/builds/dolphin-master-" + m_major_version + "-";
+            string base_url = "https://dl.dolphin-emu.org/builds/dolphin-master-";
             int test_index = 0;
             RunBuild run_build = new RunBuild();
 
@@ -47,7 +45,7 @@ namespace DolphinBisectTool
 
                 test_index = m_first_index == -1 ? (0 + m_second_index) / 2 : (m_first_index + m_second_index) / 2;
 
-                Download(base_url + m_build_list[test_index] + "-x64.7z", m_major_version, m_build_list[test_index]);
+                Download(base_url + m_build_list[test_index] + "-x64.7z", m_build_list[test_index]);
 
                 if (!string.IsNullOrEmpty(boot_title))
                     run_build.Run(boot_title);
@@ -68,11 +66,11 @@ namespace DolphinBisectTool
 
             if (open_url == UserInput.Yes)
             {
-                Process.Start("https://dolp.in/" + m_major_version + "-" + m_build_list[test_index+1]);
+                Process.Start("https://dolp.in/" + m_build_list[test_index+1]);
             }
         }
 
-        public void Download(string url, string major_version, int version)
+        public void Download(string url, string version)
         {
             // Windows will throw an error if you have the folder you're trying to delete open in
             // explorer. It will remove the contents but error out on the folder removal. That's

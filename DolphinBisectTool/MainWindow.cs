@@ -7,7 +7,7 @@ namespace DolphinBisectTool
     public partial class MainWindow : Form
     {
 
-        List<int> m_build_list;
+        List<string> m_build_list;
         static string s_major_version = "5.0";
 
         DownloadBuildList m_download_build_list = new DownloadBuildList();
@@ -30,12 +30,12 @@ namespace DolphinBisectTool
             DialogResult result;
             if (!final_trigger)
             {
-                result = MessageBox.Show("Tested build " + s_major_version + "-" + m_build_list[build] + ". Did the bug happen in this build?",
+                result = MessageBox.Show("Tested build " + m_build_list[build] + ". Did the bug happen in this build?",
                          "Bisect", MessageBoxButtons.YesNoCancel);
             }
             else
             {
-                result = MessageBox.Show("Build " + s_major_version + "-" + m_build_list[build] + " may be the cause of your issue. " +
+                result = MessageBox.Show("Build " + m_build_list[build] + " may be the cause of your issue. " +
                                          "Do you want to open the URL for that build?", "Notice",
                                          MessageBoxButtons.YesNo);
                 start_button.Enabled = true;
@@ -72,9 +72,6 @@ namespace DolphinBisectTool
         {
             int first_build;
 
-            if (radio_stable.Checked)
-                first_build = 0;
-            else
                 first_build = first_dev_build.SelectedIndex;
 
             if (second_dev_build.SelectedIndex <= first_build)
@@ -85,7 +82,7 @@ namespace DolphinBisectTool
 
             start_button.Enabled = false;
 
-            Backend backend = new Backend(first_build, second_dev_build.SelectedIndex, m_build_list, s_major_version);
+            Backend backend = new Backend(first_build, second_dev_build.SelectedIndex, m_build_list);
             backend.BisectEvent += BisectUserDialog;
             backend.UpdateProgress += ChangeProgressBar;
 
@@ -121,12 +118,12 @@ namespace DolphinBisectTool
             }
         }
 
-        private void PopulateComboBoxes(List<int> list)
+        private void PopulateComboBoxes(List<string> list)
         {
-            foreach (int i in list)
+            foreach (string i in list)
             {
-                first_dev_build.Items.Add(s_major_version + "-" + i);
-                second_dev_build.Items.Add(s_major_version + "-" + i);
+                first_dev_build.Items.Add(i);
+                second_dev_build.Items.Add(i);
             }
 
             first_dev_build.SelectedIndex = 0;
@@ -138,30 +135,6 @@ namespace DolphinBisectTool
         {
             Enabled = true;
             download_label.Visible = false;
-            radio_development.Enabled = true;
-            radio_stable.Select();
-        }
-
-        private void rbFirstStable_CheckedChanged(object sender, EventArgs e)
-        {
-            if (radio_stable.Checked)
-            {
-                first_stable_label.Text = "Version 4.0.2 will be tested against";
-                first_stable_label.Visible = true;
-                first_stable_label.Enabled = true;
-                first_dev_build.Enabled = false;
-                first_dev_build.Visible = false;
-            }
-        }
-
-        private void rbFirstDevelopment_CheckedChanged(object sender, EventArgs e)
-        {
-            if (radio_development.Checked)
-            {
-                first_stable_label.Visible = false;
-                first_dev_build.Enabled = true;
-                first_dev_build.Visible = true;
-            }
         }
     }
 }

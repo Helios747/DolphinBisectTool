@@ -25,7 +25,7 @@ namespace DolphinBisectTool
                     this.UpdateProgress(100, "Parsing build list", ProgressBarStyle.Marquee);
                 };
 
-                client.DownloadFileAsync(new Uri("https://dl.dolphin-emu.org/builds/"), "buildindex");
+                client.DownloadFileAsync(new Uri("https://www.dolphin-emu.org/download/buildlist"), "buildindex");
             }
         }
     }

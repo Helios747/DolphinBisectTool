@@ -18,7 +18,6 @@ namespace DolphinBisectTool
             using (var runner = new Process())
             {
                 runner.StartInfo.WorkingDirectory = starting_directory;
-                // This is probably gross.
                 runner.StartInfo.FileName = starting_directory + string.Join("", match);
                 runner.StartInfo.UseShellExecute = false;
                 if (!string.IsNullOrEmpty(title))
