@@ -45,18 +45,18 @@
             this.first_build_label.AutoSize = true;
             this.first_build_label.Location = new System.Drawing.Point(12, 9);
             this.first_build_label.Name = "first_build_label";
-            this.first_build_label.Size = new System.Drawing.Size(261, 13);
+            this.first_build_label.Size = new System.Drawing.Size(202, 13);
             this.first_build_label.TabIndex = 0;
-            this.first_build_label.Text = "Select a development build before the issue appeared";
+            this.first_build_label.Text = "Select a development build that is broken";
             // 
             // second_build_label
             // 
             this.second_build_label.AutoSize = true;
             this.second_build_label.Location = new System.Drawing.Point(12, 89);
             this.second_build_label.Name = "second_build_label";
-            this.second_build_label.Size = new System.Drawing.Size(263, 13);
+            this.second_build_label.Size = new System.Drawing.Size(203, 13);
             this.second_build_label.TabIndex = 1;
-            this.second_build_label.Text = "Select the development build where you saw the issue";
+            this.second_build_label.Text = "Select the development build that worked\r\n";
             // 
             // boot_title
             // 
