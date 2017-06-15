@@ -40,7 +40,7 @@ namespace DolphinBisectTool
             int test_index = 0;
             RunBuild run_build = new RunBuild();
 
-            while (m_first_index <= m_second_index)
+            while (!(m_first_index == m_second_index-1))
             {
 
                 test_index = m_first_index == -1 ? (0 + m_second_index) / 2 : (m_first_index + m_second_index) / 2;
@@ -55,9 +55,9 @@ namespace DolphinBisectTool
                 UserInput return_val = BisectEvent(test_index);
 
                 if (return_val == UserInput.Yes)
-                    m_second_index = test_index - 1;
+                    m_first_index = test_index;
                 else if (return_val == UserInput.No)
-                    m_first_index = test_index + 1;
+                    m_second_index = test_index;
                 else
                     return;
             }
@@ -66,7 +66,7 @@ namespace DolphinBisectTool
 
             if (open_url == UserInput.Yes)
             {
-                Process.Start("https://dolp.in/" + m_build_list[test_index+1]);
+                Process.Start("https://dolp.in/" + m_build_list[test_index-1]);
             }
         }
 

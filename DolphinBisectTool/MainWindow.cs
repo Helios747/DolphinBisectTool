@@ -35,7 +35,7 @@ namespace DolphinBisectTool
             }
             else
             {
-                result = MessageBox.Show("Build " + m_build_list[build] + " may be the cause of your issue. " +
+                result = MessageBox.Show("Build " + m_build_list[build-1] + " may be the cause of your issue. " +
                                          "Do you want to open the URL for that build?", "Notice",
                                          MessageBoxButtons.YesNo);
                 start_button.Enabled = true;
@@ -70,11 +70,8 @@ namespace DolphinBisectTool
 
         private void start_button_Click(object sender, EventArgs e)
         {
-            int first_build;
 
-                first_build = first_dev_build.SelectedIndex;
-
-            if (second_dev_build.SelectedIndex <= first_build)
+            if (second_dev_build.SelectedIndex <= first_dev_build.SelectedIndex)
             {
                 MessageBox.Show("Second build cannot be less than or equal to the first.", "Error", MessageBoxButtons.OK);
                 return;
@@ -82,7 +79,7 @@ namespace DolphinBisectTool
 
             start_button.Enabled = false;
 
-            Backend backend = new Backend(first_build, second_dev_build.SelectedIndex, m_build_list);
+            Backend backend = new Backend(first_dev_build.SelectedIndex, second_dev_build.SelectedIndex, m_build_list);
             backend.BisectEvent += BisectUserDialog;
             backend.UpdateProgress += ChangeProgressBar;
 
