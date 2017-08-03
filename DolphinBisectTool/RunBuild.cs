@@ -21,7 +21,7 @@ namespace DolphinBisectTool
                 runner.StartInfo.FileName = starting_directory + string.Join("", match);
                 runner.StartInfo.UseShellExecute = false;
                 if (!string.IsNullOrEmpty(title))
-                    runner.StartInfo.Arguments = string.Format("/b /e \"{0}\"", title);
+                    runner.StartInfo.Arguments = string.Format("-b -e \"{0}\"", title);
                 runner.Start();
                 runner.WaitForExit();
             }
