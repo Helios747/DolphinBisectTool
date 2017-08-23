@@ -56,6 +56,11 @@ namespace DolphinBisectTool
             }
         }
 
+        private void BisectErrorDialog(string e)
+        {
+            MessageBox.Show(e);
+        }
+
         private void browse_button_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
@@ -82,6 +87,7 @@ namespace DolphinBisectTool
             Backend backend = new Backend(first_dev_build.SelectedIndex, second_dev_build.SelectedIndex, m_build_list);
             backend.BisectEvent += BisectUserDialog;
             backend.UpdateProgress += ChangeProgressBar;
+            backend.BisectError += BisectErrorDialog;
 
             if (boot_title.Checked)
                 backend.Bisect(file_path_textbox.Text);

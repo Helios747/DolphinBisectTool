@@ -20,6 +20,9 @@ namespace DolphinBisectTool
         internal delegate UserInput BisectEventDelegate(int build, bool final_trigger = false);
         internal event BisectEventDelegate BisectEvent;
 
+        internal delegate void BisectErrorDelegate(string e);
+        internal event BisectErrorDelegate BisectError;
+
         internal delegate void UpdateProgressDelegate(int progress_percentage, string ui_text, ProgressBarStyle progress_type);
         internal event UpdateProgressDelegate UpdateProgress;
 
@@ -38,6 +41,7 @@ namespace DolphinBisectTool
         {
             string base_url = "https://dl.dolphin-emu.org/builds/dolphin-master-";
             int test_index = 0;
+            int test_direction = 0;
             RunBuild run_build = new RunBuild();
 
             while (!(m_first_index == m_second_index-1))
@@ -45,7 +49,24 @@ namespace DolphinBisectTool
 
                 test_index = m_first_index == -1 ? (0 + m_second_index) / 2 : (m_first_index + m_second_index) / 2;
 
-                Download(base_url + m_build_list[test_index] + "-x64.7z", m_build_list[test_index]);
+                // dumb thing to make sure we keep trying to download a build until we get a valid build
+                do
+                {
+                    try
+                    {
+                        Download(base_url + m_build_list[test_index] + "-x64.7z", m_build_list[test_index]);
+                        break;
+                    }
+                    catch (Exception e)
+                    {
+                        BisectError(e.Message);
+                        if (test_direction == 0)
+                            --test_index;
+                        else
+                            ++test_index;
+                    }
+                }
+                while (true);
 
                 if (!string.IsNullOrEmpty(boot_title))
                     run_build.Run(boot_title);
@@ -55,9 +76,15 @@ namespace DolphinBisectTool
                 UserInput return_val = BisectEvent(test_index);
 
                 if (return_val == UserInput.Yes)
+                {
                     m_first_index = test_index;
+                    test_direction = 1;
+                }
                 else if (return_val == UserInput.No)
+                {
                     m_second_index = test_index;
+                    test_direction = 0;
+                }
                 else
                     return;
             }
@@ -103,7 +130,15 @@ namespace DolphinBisectTool
                 {
                     UpdateProgress(eventArgs.PercentDone, "Extracting and launching", ProgressBarStyle.Continuous);
                 };
-                dolphin_zip.ExtractArchive("dolphin");
+
+                try
+                {
+                    dolphin_zip.ExtractArchive("dolphin");
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("Error extracting. Probably a missing build. Skipping this build.", e);
+                }
             }
         }
     }
