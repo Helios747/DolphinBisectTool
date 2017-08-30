@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="Backend.cs" />
     <Compile Include="DownloadBuildList.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="MainWindow.cs">
       <SubType>Form</SubType>
     </Compile>
