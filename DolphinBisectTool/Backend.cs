@@ -42,9 +42,11 @@ namespace DolphinBisectTool
             string base_url = "https://dl.dolphin-emu.org/builds/dolphin-master-";
             int test_index = 0;
             int test_direction = 0;
+            List<String> skipped_builds = new List<string>();
             RunBuild run_build = new RunBuild();
+            Logger log = new Logger();
 
-            while (!(m_first_index == m_second_index-1))
+            while (!(m_first_index == m_second_index - 1))
             {
 
                 test_index = m_first_index == -1 ? (0 + m_second_index) / 2 : (m_first_index + m_second_index) / 2;
@@ -55,10 +57,13 @@ namespace DolphinBisectTool
                     try
                     {
                         Download(base_url + m_build_list[test_index] + "-x64.7z", m_build_list[test_index]);
+                        log.Write("Testing build " + m_build_list[test_index]);
                         break;
                     }
                     catch (Exception e)
                     {
+                        log.Write("ERROR. Skipping build " + m_build_list[test_index]);
+                        skipped_builds.Add(m_build_list[test_index]);
                         BisectError(e.Message);
                         if (test_direction == 0)
                             --test_index;
@@ -77,11 +82,13 @@ namespace DolphinBisectTool
 
                 if (return_val == UserInput.Yes)
                 {
+                    log.Write("Build " + m_build_list[test_index] + " marked as a BAD build");
                     m_first_index = test_index;
                     test_direction = 1;
                 }
                 else if (return_val == UserInput.No)
                 {
+                    log.Write("Build " + m_build_list[test_index] + " marked as a GOOD build");
                     m_second_index = test_index;
                     test_direction = 0;
                 }
@@ -89,6 +96,12 @@ namespace DolphinBisectTool
                     return;
             }
 
+            log.Write("Bisect completed. " + m_build_list[test_index] + " may be the culprit.");
+            if (!(skipped_builds.Count == 0))
+            {
+                string sb = string.Join(", ", skipped_builds.ToArray());
+                log.Write("Skipped builds: " + sb);
+            }
             UserInput open_url = BisectEvent(test_index, true);
 
             if (open_url == UserInput.Yes)

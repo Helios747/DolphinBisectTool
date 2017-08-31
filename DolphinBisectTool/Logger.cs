@@ -17,7 +17,14 @@ namespace DolphinBisectTool
 
         ~Logger()
         {
-            log_file.Close();
+            // TODO - figure out why closing the file here throws an exception.
+            try
+            {
+                log_file.Close();
+            }
+            catch (Exception e)
+            {
+            }
         }
 
         public void Write(string s)
