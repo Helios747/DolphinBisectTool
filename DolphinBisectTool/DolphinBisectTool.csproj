@@ -109,8 +109,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="7z.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="..\External Libs\7z.dll">
+      <Link>7z.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
