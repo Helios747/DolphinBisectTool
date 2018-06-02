@@ -6,25 +6,34 @@ using System.Text;
 
 namespace DolphinBisectTool
 {
-    class Logger
+    class Logger : IDisposable
     {
         StreamWriter log_file;
+        bool disposed = false;
+
 
         public Logger()
         {
             log_file = new StreamWriter("log-" + DateTime.Now.ToString("yyyy-MM-dd_hhmmss") + ".txt");
         }
 
-        ~Logger()
+        public void Dispose()
         {
-            // TODO - figure out why closing the file here throws an exception.
-            try
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+                return;
+
+            if (disposing)
             {
                 log_file.Close();
             }
-            catch (Exception e)
-            {
-            }
+
+            disposed = true;
         }
 
         public void Write(string s)

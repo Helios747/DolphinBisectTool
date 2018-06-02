@@ -101,6 +101,7 @@ namespace DolphinBisectTool
             {
                 string sb = string.Join(", ", skipped_builds.ToArray());
                 log.Write("Skipped builds: " + sb);
+                log.Dispose();
             }
             UserInput open_url = BisectEvent(test_index, true);
 
