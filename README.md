@@ -1,5 +1,5 @@
 # DolphinBisectTool
-Windows utility to automate the bisection process for issues in the Dolphin Emulator. This is an unofficial utility not endorsed by the Dolphin Emulator project. Do not file any bugs on the Dolphin Emulator bug tracker. Please file all issues for the utility here on Github.
+Windows utility to automate the bisection process for issues in the Dolphin Emulator. Do not file any bugs on the Dolphin Emulator bug tracker. Please file all issues for the utility here on Github.
 
 # Requirements
 Dolphin Bisect Tool requires .NET 4.0 framework to run.
