@@ -2,7 +2,7 @@
 Windows utility to automate the bisection process for issues in the Dolphin Emulator. Do not file any bugs on the Dolphin Emulator bug tracker. Please file all issues for the utility here on Github.
 
 # Requirements
-Dolphin Bisect Tool requires .NET 4.0 framework to run.
+Dolphin Bisect Tool requires .NET 4.5 framework to run.
 
 To compile, Dolphin Bisect Tool was written and compiled in Visual Studio 2015/2017. 2013 supposedly works, but is not tested. Due to the crappy 7zip library I used, set your build settings to create a x86 build.
 
