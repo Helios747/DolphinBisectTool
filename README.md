@@ -1,3 +1,5 @@
+This is unmaintained and no longer useful. Additionally, I am much older, and slightly better at programming now. Please don't use this as a reference for anything ever.
+
 # DolphinBisectTool
 Windows utility to automate the bisection process for issues in the Dolphin Emulator. Do not file any bugs on the Dolphin Emulator bug tracker. Please file all issues for the utility here on Github.
 
