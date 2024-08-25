@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace DolphinBisectTool
@@ -7,7 +8,7 @@ namespace DolphinBisectTool
     public partial class MainWindow : Form
     {
 
-        List<string> m_build_list;
+        Dictionary<string, string> m_build_list;
         static string s_major_version = "5.0";
 
         DownloadBuildList m_download_build_list = new DownloadBuildList();
@@ -30,12 +31,12 @@ namespace DolphinBisectTool
             DialogResult result;
             if (!final_trigger)
             {
-                result = MessageBox.Show("Tested build " + m_build_list[build] + ". Did the bug happen in this build?",
+                result = MessageBox.Show("Tested build " + m_build_list.ElementAt(build).Key + ". Did the bug happen in this build?",
                          "Bisect", MessageBoxButtons.YesNoCancel);
             }
             else
             {
-                result = MessageBox.Show("Build " + m_build_list[build-1] + " may be the cause of your issue. " +
+                result = MessageBox.Show("Build " + m_build_list.ElementAt(build-1).Key + " may be the cause of your issue. " +
                                          "Do you want to open the URL for that build?", "Notice",
                                          MessageBoxButtons.YesNo);
                 start_button.Enabled = true;
@@ -111,8 +112,8 @@ namespace DolphinBisectTool
                 download_label.Text = text;
                 download_bar.Style = style;
                 ProcessBuildList process_build = new ProcessBuildList();
-                m_build_list = process_build.Run(s_major_version);
-                PopulateComboBoxes(m_build_list);
+                m_build_list = process_build.Run();
+                PopulateComboBoxes(m_build_list.Keys.ToList());
             }
             else
             {

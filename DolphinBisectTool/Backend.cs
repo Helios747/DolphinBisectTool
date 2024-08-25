@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Windows.Forms;
 using SevenZip;
@@ -28,9 +29,9 @@ namespace DolphinBisectTool
 
         int m_first_index;
         int m_second_index;
-        List<string> m_build_list;
+        readonly Dictionary<string, string> m_build_list;
 
-        public Backend(int first_index, int second_index, List<string> build_list)
+        public Backend(int first_index, int second_index, Dictionary<string, string> build_list)
         {
             m_first_index = first_index;
             m_second_index = second_index;
@@ -39,7 +40,6 @@ namespace DolphinBisectTool
 
         public void Bisect(string boot_title = "")
         {
-            string base_url = "https://dl.dolphin-emu.org/builds/dolphin-master-";
             int test_index = 0;
             int test_direction = 0;
             List<String> skipped_builds = new List<string>();
@@ -50,20 +50,21 @@ namespace DolphinBisectTool
             {
 
                 test_index = m_first_index == -1 ? (0 + m_second_index) / 2 : (m_first_index + m_second_index) / 2;
-
+                string download_url = m_build_list.ElementAt(test_index).Value;
+                string download_revison = m_build_list.ElementAt(test_index).Key;
                 // dumb thing to make sure we keep trying to download a build until we get a valid build
                 do
                 {
                     try
                     {
-                        Download(base_url + m_build_list[test_index] + "-x64.7z", m_build_list[test_index]);
-                        log.Write("Testing build " + m_build_list[test_index]);
+                        Download(download_url);
+                        log.Write("Testing build " + download_revison);
                         break;
                     }
                     catch (Exception e)
                     {
-                        log.Write("ERROR. Skipping build " + m_build_list[test_index]);
-                        skipped_builds.Add(m_build_list[test_index]);
+                        log.Write("ERROR. Skipping build " + download_revison);
+                        skipped_builds.Add(download_revison);
                         BisectError(e.Message);
                         if (test_direction == 0)
                             --test_index;
@@ -82,13 +83,13 @@ namespace DolphinBisectTool
 
                 if (return_val == UserInput.Yes)
                 {
-                    log.Write("Build " + m_build_list[test_index] + " marked as a BAD build");
+                    log.Write("Build " + download_revison + " marked as a BAD build");
                     m_first_index = test_index;
                     test_direction = 1;
                 }
                 else if (return_val == UserInput.No)
                 {
-                    log.Write("Build " + m_build_list[test_index] + " marked as a GOOD build");
+                    log.Write("Build " + download_revison + " marked as a GOOD build");
                     m_second_index = test_index;
                     test_direction = 0;
                 }
@@ -96,7 +97,7 @@ namespace DolphinBisectTool
                     return;
             }
 
-            log.Write("Bisect completed. " + m_build_list[test_index] + " may be the culprit.");
+            log.Write("Bisect completed. " + m_build_list.ElementAt(test_index).Key + " may be the culprit.");
             if (!(skipped_builds.Count == 0))
             {
                 string sb = string.Join(", ", skipped_builds.ToArray());
@@ -107,11 +108,11 @@ namespace DolphinBisectTool
 
             if (open_url == UserInput.Yes)
             {
-                Process.Start("https://dolp.in/" + m_build_list[test_index-1]);
+                Process.Start("https://dolp.in/" + m_build_list.ElementAt(test_index - 1).Key);
             }
         }
 
-        public void Download(string url, string version)
+        public void Download(string url)
         {
             // Windows will throw an error if you have the folder you're trying to delete open in
             // explorer. It will remove the contents but error out on the folder removal. That's
